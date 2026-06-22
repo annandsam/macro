@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Macro — Sam Annand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #0c0b09; --chalk: #ede9e4; --stone: #6e6860;
+    --amber: #b89060; --slate: #1a1815;
+    --black: #111111; --white: #ffffff; --border: 2px solid #111111; --yellow: #acc6a1;
+  }
+  html { height: 100%; }
+  body {
+    height: 100%; background: var(--yellow); color: var(--chalk);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    padding: 12px; overflow: hidden;
+  }
+  .site-wrap {
+    display: flex; flex-direction: column; height: calc(100vh - 24px);
+    background: var(--ink); border-radius: 18px; border: var(--border); overflow: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    display: flex; align-items: stretch;
+    border-bottom: var(--border); border-radius: 16px 16px 0 0;
+    position: relative; background: var(--white); flex-shrink: 0;
+  }
+  .nav-logo {
+    font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--black); text-decoration: none;
+    padding: 22px 28px; border-right: var(--border);
+    white-space: nowrap; display: flex; align-items: center;
+  }
+  .nav-links { display: flex; list-style: none; flex: 1; }
+  .nav-item { position: relative; flex: 1; }
+  .nav-item > a {
+    display: flex; align-items: center; justify-content: center;
+    height: 100%; width: 100%; padding: 22px 22px;
+    font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--black); text-decoration: none;
+    border-right: var(--border); white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .nav-item:last-child > a { border-right: none; }
+  .nav-item > a:hover { background: var(--yellow); color: var(--black); }
+
+  .dropdown-wrap {
+    position: absolute; top: 100%; left: -2px;
+    overflow: hidden; max-height: 0;
+    transition: max-height 0.3s ease;
+    width: calc(var(--dropdown-w, 200px) + 2px); z-index: 100;
+  }
+  .nav-item:hover > .dropdown-wrap {
+    max-height: 400px; overflow: visible; pointer-events: all;
+  }
+  .dropdown {
+    background: var(--white); border: var(--border); pointer-events: none;
+  }
+  .nav-item:hover > .dropdown-wrap .dropdown { pointer-events: all; }
+  .dropdown a {
+    display: flex; align-items: center; height: 40px; padding: 0 20px;
+    font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--black); text-decoration: none;
+    border-bottom: var(--border); transition: background 0.15s; white-space: nowrap;
+  }
+  .dropdown a:last-child { border-bottom: none; }
+  .dropdown a:hover { background: var(--yellow); color: var(--black); }
+  .dd-divider { display: none; }
+
+  /* ── LAYOUT ── */
+  .hero {
+    height: 100vh; display: grid; grid-template-columns: 1fr 1fr;
+  }
+
+  /* ── LEFT ── */
+  .hero-left {
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 48px 48px 64px;
+    background: #4887c9;
+  }
+  h1.hero-name {
+    font-family: 'Bodoni Moda', Georgia, serif;
+    font-size: clamp(58px, 6.5vw, 105px);
+    font-weight: 400; line-height: 1;
+    letter-spacing: 0em; color: var(--chalk);
+    opacity: 0; animation: fadeUp 1s ease 0.4s forwards;
+    white-space: nowrap;
+  }
+  .hero-role {
+    margin-top: 16px;
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    letter-spacing: 0.28em; text-transform: uppercase;
+    color: rgba(237,233,228,0.45);
+    opacity: 0; animation: fadeUp 1s ease 0.6s forwards;
+  }
+
+  /* ── RIGHT: PAINTING ── */
+  .hero-right { position: relative; overflow: hidden; }
+  .painting-wrap {
+    position: absolute; inset: 0;
+    opacity: 0; animation: fadeIn 1.5s ease 0.1s forwards;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .painting-img {
+    width: 100%; height: 100%; object-fit: cover;
+    object-position: 50% 50%; display: block;
+    filter: saturate(0.88) brightness(0.94);
+  }
+  .painting-caption {
+    position: absolute; bottom: 32px; right: 32px;
+    font-family: 'Space Mono', monospace; font-size: 9px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(237,233,228,0.35); text-align: right; line-height: 1.8;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+
+  .flyout-item { position: relative; }
+  .flyout-trigger {
+    display: flex; justify-content: space-between; align-items: center;
+    height: 40px; padding: 0 20px;
+    font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--black); text-decoration: none;
+    border-bottom: var(--border); cursor: default;
+    transition: background 0.15s; white-space: nowrap;
+  }
+  .flyout-item:last-child > .flyout-trigger { border-bottom: none; }
+  .flyout-trigger:hover { background: var(--yellow); color: var(--black); }
+  .flyout-arrow { opacity: 0.5; margin-left: 12px; font-size: 9px; }
+  .flyout {
+    position: absolute; left: 100%; top: -2px;
+    background: var(--white); border: var(--border);
+    width: calc(var(--flyout-w, 200px) + 2px);
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.22s ease;
+    pointer-events: none;
+  }
+  .flyout-item:hover > .flyout { clip-path: inset(0 0% 0 0); pointer-events: all; }
+  .flyout a {
+    display: flex; align-items: center; height: 40px; padding: 0 20px;
+    font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--black); text-decoration: none;
+    border-bottom: var(--border); transition: background 0.15s; white-space: nowrap;
+  }
+  .flyout a:last-child { border-bottom: none; }
+  .flyout a:hover { background: var(--yellow); color: var(--black); }
+
+  .nav-hamburger {
+    display: none; background: none; border: none; cursor: pointer;
+    padding: 22px 24px; flex-direction: column; gap: 5px;
+    z-index: 300; margin-left: auto; border-left: var(--border);
+  }
+  .nav-hamburger span {
+    display: block; width: 22px; height: 2px; background: var(--black);
+    transition: transform 0.25s, opacity 0.25s; transform-origin: center;
+  }
+  nav.nav-open .nav-hamburger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  nav.nav-open .nav-hamburger span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  nav.nav-open .nav-hamburger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    body { padding: 8px; }
+    .macro-graphic { width: clamp(220px, 75vw, 380px); }
+  }
+  @media (max-width: 640px) {
+    body { padding: 6px; }
+    nav { flex-wrap: wrap; }
+    .nav-hamburger { display: flex; }
+    .nav-links {
+      display: none !important; position: absolute; top: 100%; left: -2px; right: -2px;
+      background: var(--white); flex-direction: column !important; border: var(--border); z-index: 250;
+    }
+    nav.nav-open .nav-links { display: flex !important; }
+    .nav-item { width: 100%; }
+    .nav-item > a {
+      padding: 16px 22px !important; font-size: 10px !important;
+      border-right: none !important; border-bottom: var(--border) !important; height: auto !important;
+    }
+    .dropdown-wrap {
+      position: static !important; width: auto !important;
+      max-height: 0 !important; overflow: hidden !important; transition: max-height 0.35s ease !important;
+    }
+    .dropdown-wrap.mob-open { max-height: 700px !important; overflow: visible !important; }
+    .dropdown { border: none !important; }
+    .dropdown a { padding-left: 36px !important; }
+    .flyout { position: static !important; width: auto !important; clip-path: none !important; display: none; border: none !important; }
+    .flyout-item.mob-open > .flyout { display: block; pointer-events: all; }
+    .flyout a { padding-left: 52px !important; }
+    .flyout a:last-child { border-bottom: var(--border) !important; }
+    .flyout-trigger { border-bottom: var(--border) !important; }
+    .nav-item:last-child > a { border-bottom: none !important; }
+  }
+
+
+
+  .macro-page {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: #014b4a;
+  }
+  .macro-graphic {
+    --moire-x: 0px; --moire-y: 0px; --moire-start: 0deg; --moire-opacity: 1;
+    position: relative;
+    width: clamp(280px, 48vmin, 540px);
+    aspect-ratio: 1;
+    opacity: 0;
+    animation: fadeIn 1.8s ease 0.3s forwards;
+  }
+  .macro-lines {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    overflow: visible; mix-blend-mode: screen; pointer-events: none;
+    transform-origin: 50% 50%;
+  }
+  .macro-lines line { stroke: #fff; stroke-width: 4.2; stroke-linecap: butt; shape-rendering: geometricPrecision; }
+  .macro-lines circle { fill: #fff; shape-rendering: geometricPrecision; }
+  .macro-lines--still { opacity: 1; }
+  .macro-lines--moire {
+    opacity: var(--moire-opacity);
+    animation: macroMoireTurn 420s linear infinite;
+    will-change: transform;
+  }
+  @keyframes macroMoireTurn {
+    from { transform: translate3d(var(--moire-x), var(--moire-y), 0) rotate(var(--moire-start)) scale(1.006); }
+    to   { transform: translate3d(var(--moire-x), var(--moire-y), 0) rotate(calc(var(--moire-start) + 360deg)) scale(1.006); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .macro-lines--moire { animation-duration: 1200s; }
+  }
+  .macro-label {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: rgba(237,233,228,0.3);
+    white-space: nowrap;
+    opacity: 0;
+    animation: fadeIn 1.5s ease 1.6s forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="site-wrap">
+<nav>
+  <a href="https://annandsam.github.io/home/" class="nav-logo">Sam Annand</a>
+  <button class="nav-hamburger" aria-label="Menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links">
+
+    <li class="nav-item"><a href="https://annandsam.github.io/home/">Home</a></li>
+
+    <li class="nav-item">
+      <a href="#">Projects</a>
+      <div class="dropdown-wrap"><div class="dropdown">
+        <a href="https://annandsam.github.io/resono/">Resono</a>
+        <a href="https://annandsam.github.io/macro/">Macro</a>
+        <div class="dd-divider"></div>
+        <div class="flyout-item">
+          <a href="#" class="flyout-trigger">Other <span class="flyout-arrow">›</span></a>
+          <div class="flyout">
+            <a href="https://music.apple.com/gb/album/birds-of-prey-ep/274154965" target="_blank">Architeq</a>
+            <a href="https://samply.app/p/KMazQ1LOe1dKvBTZiBRq" target="_blank">Semi-Precious Stones</a>
+          </div>
+        </div>
+        <div class="flyout-item">
+          <a href="#" class="flyout-trigger">Collaborations <span class="flyout-arrow">›</span></a>
+          <div class="flyout">
+            <a href="https://www.sionparkinson.com/perfumes-2" target="_blank">Si&#244;n Parkinson</a>
+          </div>
+        </div>
+      </div></div>
+    </li>
+
+    <li class="nav-item"><a href="https://samannand.bandcamp.com" target="_blank">Bandcamp</a></li>
+    <li class="nav-item"><a href="https://annandsam.github.io/home/mastering.html">Mastering</a></li>
+    <li class="nav-item"><a href="https://annandsam.github.io/home/about.html">About</a></li>
+    <li class="nav-item"><a href="https://annandsam.github.io/home/contact.html">Contact</a></li>
+
+  </ul>
+</nav>
+
+<div class="macro-page">
+  <div class="macro-graphic" aria-label="Macro — Sam Annand interference graphic"></div>
+  <div class="macro-label">Sam Annand · Macro · Creative Scotland 2026</div>
+</div>
+</div><!-- /site-wrap -->
+
+<script>
+(function() {
+  function syncMenuWidths() {
+    var items = document.querySelectorAll('.nav-links .nav-item');
+    if (items.length < 3) return;
+    var projW = items[1].getBoundingClientRect().width;
+    var bandW = items[2].getBoundingClientRect().width;
+    document.documentElement.style.setProperty('--dropdown-w', projW + 'px');
+    document.documentElement.style.setProperty('--flyout-w',   bandW + 'px');
+  }
+  syncMenuWidths();
+  window.addEventListener('resize', syncMenuWidths);
+})();
+
+(function() {
+  var nav    = document.querySelector('nav');
+  var burger = document.querySelector('.nav-hamburger');
+  if (!burger || !nav) return;
+  burger.addEventListener('click', function(e) {
+    e.stopPropagation();
+    var isOpen = nav.classList.toggle('nav-open');
+    burger.setAttribute('aria-expanded', String(isOpen));
+  });
+  var ddWrap = document.querySelector('.dropdown-wrap');
+  if (ddWrap) {
+    var ddItem = ddWrap.closest('.nav-item');
+    var ddLink = ddItem ? ddItem.querySelector(':scope > a') : null;
+    if (ddLink) {
+      ddLink.addEventListener('click', function(e) {
+        if (window.innerWidth <= 640) {
+          e.preventDefault(); e.stopPropagation();
+          ddWrap.classList.toggle('mob-open');
+        }
+      });
+    }
+  }
+  document.querySelectorAll('.flyout-item').forEach(function(fi) {
+    var trigger = fi.querySelector('.flyout-trigger');
+    var flyout  = fi.querySelector('.flyout');
+    if (trigger && flyout) {
+      trigger.addEventListener('click', function(e) {
+        if (window.innerWidth <= 640) {
+          e.preventDefault(); e.stopPropagation();
+          fi.classList.toggle('mob-open');
+        }
+      });
+    }
+  });
+  document.addEventListener('click', function(e) {
+    if (!nav.contains(e.target)) {
+      nav.classList.remove('nav-open');
+      burger.setAttribute('aria-expanded', 'false');
+    }
+  });
+  document.querySelectorAll('.nav-links a').forEach(function(a) {
+    if (a.getAttribute('href') !== '#') {
+      a.addEventListener('click', function() {
+        nav.classList.remove('nav-open');
+        burger.setAttribute('aria-expanded', 'false');
+      });
+    }
+  });
+})();
+
+(function() {
+  var page = document.querySelector('.macro-page');
+  var graphic = document.querySelector('.macro-graphic');
+  if (!page || !graphic) return;
+
+  function buildLineLayer(className) {
+    var ns = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(ns, 'svg');
+    var center = 500, innerRadius = 108, outerRadius = 432, spokes = 60;
+    svg.setAttribute('class', 'macro-lines ' + className);
+    svg.setAttribute('viewBox', '0 0 1000 1000');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('focusable', 'false');
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    for (var i = 0; i < spokes; i += 1) {
+      var angle = ((i / spokes) * Math.PI * 2) - (Math.PI / 2);
+      var line = document.createElementNS(ns, 'line');
+      line.setAttribute('x1', String(center + Math.cos(angle) * innerRadius));
+      line.setAttribute('y1', String(center + Math.sin(angle) * innerRadius));
+      line.setAttribute('x2', String(center + Math.cos(angle) * outerRadius));
+      line.setAttribute('y2', String(center + Math.sin(angle) * outerRadius));
+      svg.appendChild(line);
+    }
+    var core = document.createElementNS(ns, 'circle');
+    core.setAttribute('cx', String(center));
+    core.setAttribute('cy', String(center));
+    core.setAttribute('r', '109');
+    svg.appendChild(core);
+    return svg;
+  }
+
+  if (!graphic.querySelector('.macro-lines')) {
+    graphic.appendChild(buildLineLayer('macro-lines--still'));
+    graphic.appendChild(buildLineLayer('macro-lines--moire'));
+  }
+
+  function setInterference(clientX, clientY) {
+    var rect = page.getBoundingClientRect();
+    var x = ((clientX - rect.left) / rect.width) - 0.5;
+    var y = ((clientY - rect.top) / rect.height) - 0.5;
+    graphic.style.setProperty('--moire-x', (x * 7).toFixed(2) + 'px');
+    graphic.style.setProperty('--moire-y', (y * 7).toFixed(2) + 'px');
+    graphic.style.setProperty('--moire-start', (x * 0.45).toFixed(3) + 'deg');
+    graphic.style.setProperty('--moire-opacity', '1');
+  }
+  function resetInterference() {
+    graphic.style.setProperty('--moire-x', '0px');
+    graphic.style.setProperty('--moire-y', '0px');
+    graphic.style.setProperty('--moire-start', '0deg');
+    graphic.style.setProperty('--moire-opacity', '1');
+  }
+  page.addEventListener('pointermove', function(e){ setInterference(e.clientX, e.clientY); }, { passive: true });
+  page.addEventListener('pointerdown', function(e){ setInterference(e.clientX, e.clientY); }, { passive: true });
+  page.addEventListener('pointerleave', resetInterference);
+})();
+</script>
+
+</body>
+</html>
