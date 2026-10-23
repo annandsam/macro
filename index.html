@@ -352,7 +352,7 @@ if (/iPhone|iPod/.test(navigator.userAgent) || /[?&]iosbleed/.test(location.sear
      page, the marbling bled above it and a little below; one snap point brings it back. */
   .ios-bleed { --bleed: 64px; overflow-y: scroll; overscroll-behavior-y: none; scroll-snap-type: y mandatory; }
   .ios-bleed body { height: auto; min-height: calc(100lvh + var(--bleed)); overflow: visible; }
-  .ios-bleed .frame-bath { height: calc(100lvh + var(--bleed) + 40px); }
+  .ios-bleed .frame-bath { height: calc(100lvh + var(--bleed) + 160px); }   /* 40px left a strip under the address bar (Sam, 22:20) */
   .bleed-snap { display: none; }
   .ios-bleed .bleed-snap { display: block; position: absolute; top: var(--bleed); left: 0; width: 1px; height: 1px;
     scroll-snap-align: start; pointer-events: none; }
