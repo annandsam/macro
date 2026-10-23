@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Macro · Sam Annand</title>
 <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -309,11 +309,36 @@
     text-shadow: 0 0 2px rgba(0,0,0,.65), 0 0 7px rgba(0,0,0,.5); }   /* the label reads on pale paint too */
   /* while the marbling runs, the card is see-through: the bath draws its shadow there */
   .marble-plate .site-wrap, .marble-plate .macro-page { background: none; }
+  /* and the body: its colour moves to the root (the script sets it from the paint along
+     the top edge, for Safari's status bar), or the body would paint it over the bath */
+  .marble-plate body { background: none; }
   /* the canvas runs 1px past the item inside a span that clips at the item's inner edge,
      so whatever pixel the item's border snaps to, the paint meets it (no white hairline) */
   .peek { position: absolute; inset: 0; overflow: hidden; z-index: -1; pointer-events: none; display: none; }
   .peek canvas { position: absolute; left: -1px; top: -1px; width: calc(100% + 2px); height: calc(100% + 2px); }
   .marble-menu :is(.nav-item > a, .dropdown a, .flyout-trigger, .flyout a):hover > .peek { display: block; }
+
+  /* a press is the marbling's (tap: a drop, hold: pour, drag: stir), so it never starts a
+     text selection or raises the iOS callout; nothing on this page needs selecting.
+     A drag on the card stirs the paint instead of panning the page. */
+  html, body, body * { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+  .macro-page { touch-action: none; }
+
+  /* the iPhone (Sam): the page runs under Safari's status bar and floating address bar
+     (viewport-fit=cover in the head), so the marbling shows there instead of a slate band;
+     the card keeps clear of them by the safe-area insets. The small viewport (svh) is the
+     height with Safari's bars showing; on a desktop it is just the window. */
+  body { padding: calc(12px + env(safe-area-inset-top, 0px)) calc(12px + env(safe-area-inset-right, 0px))
+                  calc(12px + env(safe-area-inset-bottom, 0px)) calc(12px + env(safe-area-inset-left, 0px)); }
+  .site-wrap { height: calc(100vh - 24px); height: calc(100svh - 24px - env(safe-area-inset-top, 0px)); }
+  @media (max-width: 768px) {
+    body { padding: calc(8px + env(safe-area-inset-top, 0px)) calc(8px + env(safe-area-inset-right, 0px))
+                    calc(8px + env(safe-area-inset-bottom, 0px)) calc(8px + env(safe-area-inset-left, 0px)); }
+  }
+  @media (max-width: 640px) {
+    body { padding: calc(6px + env(safe-area-inset-top, 0px)) calc(6px + env(safe-area-inset-right, 0px))
+                    calc(6px + env(safe-area-inset-bottom, 0px)) calc(6px + env(safe-area-inset-left, 0px)); }
+  }
 
 /* - local font experiment - */
 @font-face{font-family:'Observer Sharp';src:url(data:font/woff2;base64,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) format('woff2');font-weight:100 900;font-style:normal}
@@ -497,14 +522,15 @@
 </script>
 
 <script>
-/* Marbling — the surround of the macro card (2026-10-23): the same marbling as the
-   home, mastering and contact pages, in the colours of Sam's stone-pattern paper. Only
-   the strips round the card are drawn; the marbler drops and strokes along its edge.
+/* Marbling — round and under the macro card (2026-10-23): the same marbling as the
+   home, mastering and contact pages, in the colours of Sam's stone-pattern paper, round
+   the card; under it the same paint as a dark shadow in the card's green. Presses work
+   through the card but not the menus, whose rollover shows the paint in colour.
    Source: ~/Development/MacrotonalRestyle (samannand_macro.py, samannand/marble/engine.js,
-   a copy of ~/Development/MarbleBath/engine.js with the CFG.frame addition). */
+   a copy of ~/Development/MarbleBath/engine.js with the CFG.frame additions). */
 (function(){
 'use strict';
-const CFG = {"optics":"flat","plate":"#3f5d77","palettes":[{"name":"stone paper","ink":["#c4bead","#23211f","#e9b650","#cd4636","#e3ddcc","#3f5d77"]}],"share":[0.24,0.12,0.16,0.12,0.1,0.26],"ground":5,"deal":true,"hot":0,"vig":0,"shade":0.35,"grain":0.012,"instant":true,"fade":0.25,"frame":".site-wrap","reveal":".nav-item > a:hover, .dropdown a:hover, .flyout-trigger:hover, .flyout a:hover","shadow":{"base":"#33402f","lo":0.6,"hi":1.35,"grain":0.055}};
+const CFG = {"optics":"flat","plate":"#3f5d77","palettes":[{"name":"stone paper","ink":["#c4bead","#23211f","#e9b650","#cd4636","#e3ddcc","#3f5d77"]}],"share":[0.24,0.12,0.16,0.12,0.1,0.26],"ground":5,"deal":true,"hot":0,"vig":0,"shade":0.35,"grain":0.012,"instant":true,"fade":0.25,"frame":".site-wrap","reveal":".nav-item > a:hover, .dropdown a:hover, .flyout-trigger:hover, .flyout a:hover","shadow":{"base":"#33402f","lo":0.6,"hi":1.35,"grain":0.055},"noInput":"nav","edgeBias":0.5};
 const cv = document.getElementById('marble-canvas');
 if (!cv) return;
 
@@ -1706,10 +1732,11 @@ function cardBox(){
           gap: Math.max(1, f.left - c.left) * kx};
 }
 /* where a drop of radius R lands: anywhere on the plate or, with a card over
-   the bath, somewhere along the card's edge, never so far under it that none
-   of the drop shows round it */
+   the bath, somewhere along the card's edge (that share of the time:
+   CFG.edgeBias), never so far under it that none of the drop shows round it */
+const EDGE = CFG.edgeBias === undefined ? 1 : CFG.edgeBias;
 function spot(m, R){
-  const b = frameEl && cardBox();
+  const b = frameEl && rand() < EDGE && cardBox();
   if (!b) return inPlate(m);
   const w = b.x1 - b.x0, h = b.y1 - b.y0;
   const d = -0.7 * R + (0.7 * R + b.gap) * rand();   // outward from the edge
@@ -1783,7 +1810,7 @@ function edgeStroke(){
 
 /* strokes: a path(u) for the stroke's centre and the tine offsets across it */
 function makeStroke(kind){
-  if (frameEl && !kind){ const e = edgeStroke(); if (e) return e; }
+  if (frameEl && !kind && rand() < EDGE){ const e = edgeStroke(); if (e) return e; }
   const k = kind || ['spiral', 'curve', 'curve', 'comb', 'loop'][Math.floor(rand() * 5)];
   const s = {t0: t, kind: k, offs: [0], sg: 0.016 + 0.01 * rand(), prev: null};
   let len = 1, speed = 0.09 + 0.05 * rand();
@@ -2063,11 +2090,17 @@ const HOLD_MS = 420;
 function toWorld(cx, cy){
   const r = cv.getBoundingClientRect();
   let inside = cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom;
-  /* CFG.frame: the pointer works only the bath round the card; the card's
-     own links and presses stay the page's */
+  /* CFG.frame: the pointer works the bath round the card, and through the
+     card too when the card shows the bath (CFG.shadow) — never over
+     CFG.noInput (the menus), whose links and presses stay the page's */
   if (inside && frameEl){
-    const f = frameEl.getBoundingClientRect();
-    inside = !(cx > f.left && cx < f.right && cy > f.top && cy < f.bottom);
+    if (SHADOW){
+      const el = CFG.noInput && document.elementFromPoint(cx, cy);
+      inside = !(el && el.closest(CFG.noInput));
+    } else {
+      const f = frameEl.getBoundingClientRect();
+      inside = !(cx > f.left && cx < f.right && cy > f.top && cy < f.bottom);
+    }
   }
   return {x: (cx - r.left) / Math.max(1, r.width) * VX,
           y: (1 - (cy - r.top) / Math.max(1, r.height)) * VY,
@@ -2356,7 +2389,40 @@ try {
   root.classList.add('marble-menu', 'marble-plate');
   bath.addEventListener('webglcontextlost', () => root.classList.remove('marble-plate'));
   bath.addEventListener('webglcontextrestored', () => root.classList.add('marble-plate'));
+
+  /* Safari on the iPhone may paint its status bar in the page's background colour rather
+     than show the page there: keep that colour the marbling's own along the top edge
+     (the ink most of the edge is in, held unless another clearly takes over) */
+  const INKS = MARBLE.CFG.palettes[0].ink;
+  const RGB = INKS.map(h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)));
+  const probe = document.createElement('canvas');
+  probe.width = 48; probe.height = 1;
+  const pg = probe.getContext('2d', {willReadFrequently: true});
+  let probedAt = performance.now() - 1500, tint = -1;
+  function tintFromTop(src){
+    const now = performance.now();
+    if (now - probedAt < 2000) return;
+    probedAt = now;
+    pg.drawImage(src, 0, 0, src.width, Math.max(1, Math.round(src.height / 200)), 0, 0, 48, 1);
+    const d = pg.getImageData(0, 0, 48, 1).data, n = RGB.map(() => 0);
+    for (let i = 0; i < d.length; i += 4){
+      let best = 0, bd = Infinity;
+      RGB.forEach((c, k) => {
+        const e = (d[i] - c[0]) ** 2 + (d[i + 1] - c[1]) ** 2 + (d[i + 2] - c[2]) ** 2;
+        if (e < bd){ bd = e; best = k; }
+      });
+      n[best]++;
+    }
+    let k = n.indexOf(Math.max(...n));
+    if (tint >= 0 && n[k] < 1.3 * n[tint]) k = tint;
+    if (k !== tint){
+      tint = k;
+      root.style.backgroundColor = INKS[k];
+    }
+  }
+
   MARBLE.onFrame = function(src){
+    tintFromTop(src);
     const items = document.querySelectorAll(HOVER);
     if (!items.length) return;
     const b = src.getBoundingClientRect();
