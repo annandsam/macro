@@ -298,7 +298,13 @@
   /* ── the surround: a marbling bath behind the card, in the colours of Sam's stone
      paper; only the strips round the card are drawn (the engine's CFG.frame). Its
      own colour is what shows before the paint comes in, or without WebGL. */
-  .frame-bath { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+  /* not position:fixed: iOS 26 Safari paints its status bar and toolbar one solid colour
+     when a fixed layer touches the screen's edges (its own or the root's background); the
+     page never scrolls, so an ordinary layer stays put and Safari can show it under its
+     bars. 100lvh is the screen's height with Safari's bars put away, so it reaches under
+     them (on a desktop it is just the window). */
+  .frame-bath { position: absolute; top: 0; left: 0; right: 0; height: 100%; height: 100lvh;
+    z-index: -1; pointer-events: none; }
   #marble-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   /* the rollover is the cover green with cream type */
   .nav-item > a:hover, .dropdown a:hover, .flyout-trigger:hover, .flyout a:hover { background: #33402f; color: #efe7d2; }
